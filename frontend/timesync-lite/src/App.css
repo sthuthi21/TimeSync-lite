@@ -382,3 +382,49 @@ input, select, button {
   outline: none;
 }
 
+.history-page {
+  padding: 20px;
+}
+
+.filters {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.filters label {
+  margin-right: 10px;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.history-table th,
+.history-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.history-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.clear-history-btn {
+  background-color: black; /* Red color */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 16px;
+}
+
+.clear-history-btn:hover {
+  background-color: #333;
+}
+
+

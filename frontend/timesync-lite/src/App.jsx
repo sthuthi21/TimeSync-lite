@@ -1,20 +1,20 @@
-import React from "react";
-import Header from "./components/Header";
-//import TimetableGenerator from "./components/TimetableGenerator";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
+import HistoryPage from "./components/HistoryPage";
+import Header from "./components/Header";
 import Footer from "./components/Footer";
-import "./App.css";
+import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <Header />
-      <main>
-        <Dashboard/>
-      </main>
-      <Footer />
-    </div>
-  );
-}
+
+const App = () => (
+  <Router>
+    <Header/>
+    <Routes>
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/history" element={<HistoryPage />} />
+    </Routes>
+    <Footer/>
+  </Router>
+);
 
 export default App;
