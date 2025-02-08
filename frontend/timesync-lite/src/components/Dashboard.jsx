@@ -2,27 +2,57 @@ import React, { useState } from "react";
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState([
-    { time: "09:00 - 10:30", task: "Project Planning", priority: "High" },
-    { time: "10:30 - 11:00", task: "Break", priority: "-" },
-    { time: "11:00 - 12:30", task: "Client Meeting", priority: "Medium" },
+    { time: "09:00 - 10:30", task: "Project Planning", priority: "High", duration: "1h 30m" },
+    { time: "10:30 - 11:00", task: "Break", priority: "-", duration: "30m" },
+    { time: "11:00 - 12:30", task: "Client Meeting", priority: "Medium", duration: "1h 30m" },
   ]);
 
   const [newTask, setNewTask] = useState("");
   const [newPriority, setNewPriority] = useState("High");
+  const [newDuration, setNewDuration] = useState("");
+  const [generatedTimetable, setGeneratedTimetable] = useState([]);
 
   const handleAddTask = () => {
-    if (newTask.trim() !== "") {
+    if (newTask.trim() !== "" && newDuration.trim() !== "") {
       setTasks([
         ...tasks,
-        { time: "To be scheduled", task: newTask, priority: newPriority },
+        { time: "To be scheduled", task: newTask, priority: newPriority, duration: newDuration },
       ]);
-      setNewTask(""); // Clear the input field
+      setNewTask("");
+      setNewDuration("");
+    } else {
+      alert("Please fill out both task and duration!");
     }
   };
 
   const handleDeleteTask = (indexToDelete) => {
     setTasks(tasks.filter((_, index) => index !== indexToDelete));
   };
+
+  const handleGenerateTimetable = () => {
+    let startTime = "09:00"; // Default start time
+    const updatedTimetable = tasks.map((task) => {
+      const [hours, minutes] = startTime.split(":").map(Number); // Split and convert startTime
+      const durationMatch = task.duration.match(/(\d+)h\s*(\d*)m?/); // Regex to extract hours and minutes from duration
+  
+      if (!durationMatch) {
+        return { ...task, time: "Invalid Duration" }; // Handle invalid duration format
+      }
+  
+      const durationHours = parseInt(durationMatch[1] || "0", 10);
+      const durationMinutes = parseInt(durationMatch[2] || "0", 10);
+  
+      const endHours = hours + durationHours + Math.floor((minutes + durationMinutes) / 60);
+      const endMinutes = (minutes + durationMinutes) % 60;
+  
+      const formattedEndTime = `${String(endHours).padStart(2, "0")}:${String(endMinutes).padStart(2, "0")}`;
+      const taskTime = `${startTime} - ${formattedEndTime}`;
+      startTime = formattedEndTime; // Update start time for the next task
+      return { ...task, time: taskTime };
+    });
+    setGeneratedTimetable(updatedTimetable);
+  };
+  
 
   return (
     <div className="dashboard-container">
@@ -53,6 +83,12 @@ const Dashboard = () => {
               <option>Medium</option>
               <option>Low</option>
             </select>
+            <input
+              type="text"
+              placeholder="Duration (e.g., 1h 30m)"
+              value={newDuration}
+              onChange={(e) => setNewDuration(e.target.value)}
+            />
             <button onClick={handleAddTask}>+</button>
           </div>
         </div>
@@ -65,6 +101,7 @@ const Dashboard = () => {
               <div key={index} className="task-item">
                 <span>{task.task}</span>
                 <span className="priority">{task.priority}</span>
+                <span className="duration">{task.duration}</span>
                 <button
                   className="delete-btn"
                   onClick={() => handleDeleteTask(index)}
@@ -97,6 +134,10 @@ const Dashboard = () => {
             </select>
           </div>
         </div>
+
+        <button className="generate-btn" onClick={handleGenerateTimetable}>
+          Generate Timetable
+        </button>
       </div>
 
       {/* Right Section: Schedule Table */}
@@ -108,14 +149,16 @@ const Dashboard = () => {
               <th>Time</th>
               <th>Task</th>
               <th>Priority</th>
+              <th>Duration</th>
             </tr>
           </thead>
           <tbody>
-            {tasks.map((task, index) => (
+            {(generatedTimetable.length > 0 ? generatedTimetable : tasks).map((task, index) => (
               <tr key={index}>
                 <td>{task.time}</td>
                 <td>{task.task}</td>
                 <td>{task.priority}</td>
+                <td>{task.duration}</td>
               </tr>
             ))}
           </tbody>
@@ -126,3 +169,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+
