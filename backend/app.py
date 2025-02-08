@@ -39,8 +39,13 @@ def generate_timetable():
     data = request.json  
     tasks = data.get("tasks", [])
     available_time = data.get("available_time", ["09:00", "21:00"])
+    duration = data.get("duration", "1h 00m")
     break_preferences = data.get("break_preferences", "Every 1 hour")
     break_period = data.get("break_period", "15 minutes")
+
+    for task in tasks:
+        if "duration" not in task or not task["duration"].strip():
+            task["duration"] = "1h 00m"
 
     if not isinstance(available_time, list) or len(available_time) != 2:
         available_time = ["09:00", "21:00"]
@@ -70,54 +75,83 @@ def schedule_tasks(tasks, available_time, break_preferences, break_period):
 
     def minutes_to_time(m):
         return f"{m//60:02d}:{m%60:02d}"
+    
+    def parse_duration(duration_str):
+        """ Convert '1h 30m' format to minutes """
+        import re
+        match = re.match(r"(?:(\d+)h\s*)?(?:(\d+)m)?", duration_str)
+        if match:
+            hours = int(match.group(1)) if match.group(1) else 0
+            minutes = int(match.group(2)) if match.group(2) else 0
+            return hours * 60 + minutes
+        return 60  # Default to 60 min if format is invalid
+
+    def get_status(start_time, end_time):
+        now = datetime.now().strftime("%H:%M")  
+        now_minutes = time_to_minutes(now)
+        start_minutes = time_to_minutes(start_time)
+        end_minutes = time_to_minutes(end_time)
+
+        if now_minutes < start_minutes:
+            return "Upcoming"
+        elif start_minutes <= now_minutes <= end_minutes:
+            return "Ongoing"
+        else:
+            return "Completed"
 
     current_time = time_to_minutes(start_time)
     end_time_minutes = time_to_minutes(end_time)
 
-    # Priority order mapping
     priority_order = {"High": 1, "Medium": 2, "Low": 3, "Break": 4}
-
-    # Sort tasks by priority, then FCFS
     sorted_tasks = sorted(tasks, key=lambda t: (priority_order.get(t["priority"], 4), tasks.index(t)))
 
     timetable = []
     break_interval = {"Every 1 hour": 60, "Every 2 hours": 120, "Every 3 hours": 180}.get(break_preferences, 60)
-    work_time = 0
+    break_duration = int(break_period.split()[0]) if break_period.split()[0].isdigit() else 15  # Default: 15 min
 
-    # Assign time slots to tasks
+    next_break_time = current_time + break_interval  # Set first break time
+
     for task in sorted_tasks:
         if current_time >= end_time_minutes:
             break  # Stop if out of time
 
-        task_duration = 60  #MODIFY HERE PLSSSSS
-        next_time = current_time + task_duration
+        task_duration = parse_duration(task.get("duration", "1h 00m"))
 
-        timetable.append({
-            "time": f"{minutes_to_time(current_time)} - {minutes_to_time(next_time)}",
-            "task": task["name"],
-            "priority": task["priority"]
-        })
+        while task_duration > 0:
+            if current_time >= end_time_minutes:
+                break  # Stop if out of time
 
-        current_time = next_time  # Move to next time slot
-        work_time += task_duration
+            # Insert break if it's time
+            if current_time >= next_break_time:
+                break_end_time = current_time + break_duration
+                if break_end_time <= end_time_minutes:  # Ensure break fits in schedule
+                    timetable.append({
+                        "time": f"{minutes_to_time(current_time)} - {minutes_to_time(break_end_time)}",
+                        "task": "Break",
+                        "priority": "-",
+                        "duration": f"{break_duration}m"
+                        #"status": get_status(minutes_to_time(current_time), minutes_to_time(break_end_time))
+                    })
+                    current_time = break_end_time  # Move past break time
+                    next_break_time = current_time + break_interval  # Schedule next break
 
-        # Insert breaks at the right interval
-        if work_time >= break_interval and current_time < end_time_minutes:
-            int_break_period = int(break_period.split()[0]) if break_period.split()[0].isdigit() else 15
-            break_time =  int_break_period # Assume 15-minute breaks
-            next_time = current_time + break_time
+            # Assign task time
+            task_end_time = min(current_time + task_duration, next_break_time)
+            allocated_duration = task_end_time - current_time  # Duration of this task chunk
 
             timetable.append({
-                "time": f"{minutes_to_time(current_time)} - {minutes_to_time(next_time)}",
-                "task": "Break",
-                "priority": "-"
+                "time": f"{minutes_to_time(current_time)} - {minutes_to_time(task_end_time)}",
+                "task": task["name"],
+                "priority": task["priority"],
+                "duration": f"{allocated_duration}m"
+                #"status": get_status(minutes_to_time(current_time), minutes_to_time(break_end_time))  # ✅ Ensure proper syntax
             })
 
-            current_time = next_time
-            work_time = 0  # Reset work timer after a break
+
+            task_duration -= allocated_duration  # Reduce remaining task duration
+            current_time = task_end_time  # Move forward
 
     return timetable
-
 #History
 @app.route('/history', methods=['GET'])
 def get_history():
