@@ -1,13 +1,13 @@
-# [Project Name] 🎯
+# TimeSync-Lite 🎯
 
 
 ## Basic Details
-### Team Name: [SyncOn]
+### Team Name: SyncOn
 
 
 ### Team Members
-- Member 1: [Varsha Thomas] - [Govt. Model Engineering College]
-- Member 2: [Sthuthi Sambath] - [Govt. Model Engineering College]
+- Member 1: Varsha Thomas - Govt. Model Engineering College
+- Member 2: Sthuthi Sambath - Govt. Model Engineering College
 
 ### Hosted Project Link
 [mention your project hosted project link here]
@@ -59,14 +59,6 @@ For Software:
 ![Workflow](Add your workflow/architecture diagram here)
 *Add caption explaining your workflow*
 
-For Hardware:
-
-# Schematic & Circuit
-![Circuit](Add your circuit diagram here)
-*Add caption explaining connections*
-
-![Schematic](Add your schematic diagram here)
-*Add caption explaining the schematic*
 
 # Build Photos
 ![Team](Add photo of your team here)
@@ -90,9 +82,8 @@ For Hardware:
 [Add any extra demo materials/links]
 
 ## Team Contributions
-- [Name 1]: [Specific contributions]
-- [Name 2]: [Specific contributions]
-- [Name 3]: [Specific contributions]
+- Sthuthi Sambath: [Specific contributions]
+- Varsha Thomas: [Specific contributions]
 
 ---
 Made with ❤️ at TinkerHub
