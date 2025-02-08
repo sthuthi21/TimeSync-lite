@@ -82,8 +82,8 @@ For Software:
 [Add any extra demo materials/links]
 
 ## Team Contributions
-- Sthuthi Sambath: [Specific contributions]
-- Varsha Thomas: [Specific contributions]
+- Sthuthi Sambath: Front-end
+- Varsha Thomas: Back-end
 
 ---
 Made with ❤️ at TinkerHub

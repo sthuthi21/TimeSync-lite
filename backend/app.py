@@ -12,18 +12,79 @@ def home():
 def generate_timetable():
     data = request.json  # Get data from frontend/Postman
     tasks = data.get("tasks", [])
-    priority = data.get("priority", "High")
-    available_time = data.get("available_time", "09:00-21:00")
+    #task duration um add aakane pls
+    available_time = data.get("available_time", ["09:00", "21:00"])  # Default list
     break_preferences = data.get("break_preferences", "Every 1 hour")
-    #break time um add aakane pls
+    break_period = data.get("break_period", "15 minutes")
+    
 
-    # Placeholder logic for now
-    #timetable = [{"time": "09:00", "task": task["name"]} for task in tasks]
-    
-    #Placeholder logic - real
-    
+    # Ensure available_time is valid
+    if not isinstance(available_time, list) or len(available_time) != 2:
+        available_time = ["09:00", "21:00"]  # Fallback default
+
+    timetable = schedule_tasks(tasks, available_time, break_preferences, break_period)  # Capture the returned timetable
 
     return jsonify({"timetable": timetable})
+
+# ✅ Corrected schedule_tasks function
+def schedule_tasks(tasks, available_time, break_preferences, break_period):
+    start_time, end_time = available_time  # Extract start & end times
+
+    # Convert time to minutes for calculations
+    from datetime import datetime, timedelta
+
+    def time_to_minutes(t):
+        return int(t.split(":")[0]) * 60 + int(t.split(":")[1])
+
+    def minutes_to_time(m):
+        return f"{m//60:02d}:{m%60:02d}"
+
+    current_time = time_to_minutes(start_time)
+    end_time_minutes = time_to_minutes(end_time)
+
+    # Priority order mapping
+    priority_order = {"High": 1, "Medium": 2, "Low": 3}
+
+    # Sort tasks by priority, then FCFS
+    sorted_tasks = sorted(tasks, key=lambda t: (priority_order[t["priority"]], tasks.index(t)))
+
+    timetable = []
+    break_interval = {"Every 1 hour": 60, "Every 2 hours": 120, "Every 3 hours": 180}.get(break_preferences, 60)
+    work_time = 0
+
+    # Assign time slots to tasks
+    for task in sorted_tasks:
+        if current_time >= end_time_minutes:
+            break  # Stop if out of time
+
+        task_duration = 60  #MODIFY HERE PLSSSSS
+        next_time = current_time + task_duration
+
+        timetable.append({
+            "time": f"{minutes_to_time(current_time)} - {minutes_to_time(next_time)}",
+            "task": task["name"],
+            "priority": task["priority"]
+        })
+
+        current_time = next_time  # Move to next time slot
+        work_time += task_duration
+
+        # Insert breaks at the right interval
+        if work_time >= break_interval and current_time < end_time_minutes:
+            int_break_period = int(break_period.split()[0]) if break_period.split()[0].isdigit() else 15
+            break_time =  int_break_period # Assume 15-minute breaks
+            next_time = current_time + break_time
+
+            timetable.append({
+                "time": f"{minutes_to_time(current_time)} - {minutes_to_time(next_time)}",
+                "task": "Break",
+                "priority": "-"
+            })
+
+            current_time = next_time
+            work_time = 0  # Reset work timer after a break
+
+    return timetable
 
 def list_routes():
     import urllib
