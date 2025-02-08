@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import Header from "./Header";
+import Footer from "./Footer";
 
 const HistoryPage = () => {
   const [history, setHistory] = useState([
@@ -22,6 +24,8 @@ const HistoryPage = () => {
   });
 
   return (
+    <>
+    <Header/>
     <div className="history-page">
       <h2>Task History</h2>
 
@@ -85,6 +89,8 @@ const HistoryPage = () => {
         Clear History
       </button>
     </div>
+    <Footer/>
+    </>
   );
 };
 
