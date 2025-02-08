@@ -9,7 +9,7 @@ MONGO_URI = os.getenv("MONGO_URI")  # Get MongoDB URI from environment variable
 client = MongoClient(MONGO_URI)
 db = client["timesync_db"]
 history_collection = db["history"]
-
+'''
 history_collection.insert_one({
     "tasks": [{"name": "Test Task", "priority": "High"}],
     "available_time": ["09:00", "12:00"],
@@ -21,12 +21,13 @@ history_collection.insert_one({
 })
 
 print("✅ Test data inserted!")
+'''
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Enable cross-origin requests
+CORS(app, origins=["http://localhost:3000"])  # Enable cross-origin requests
 
 @app.route('/')
 def home():
@@ -74,10 +75,10 @@ def schedule_tasks(tasks, available_time, break_preferences, break_period):
     end_time_minutes = time_to_minutes(end_time)
 
     # Priority order mapping
-    priority_order = {"High": 1, "Medium": 2, "Low": 3}
+    priority_order = {"High": 1, "Medium": 2, "Low": 3, "Break": 4}
 
     # Sort tasks by priority, then FCFS
-    sorted_tasks = sorted(tasks, key=lambda t: (priority_order[t["priority"]], tasks.index(t)))
+    sorted_tasks = sorted(tasks, key=lambda t: (priority_order.get(t["priority"], 4), tasks.index(t)))
 
     timetable = []
     break_interval = {"Every 1 hour": 60, "Every 2 hours": 120, "Every 3 hours": 180}.get(break_preferences, 60)
