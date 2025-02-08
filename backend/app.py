@@ -1,3 +1,27 @@
+import os
+from pymongo import MongoClient
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
+
+MONGO_URI = os.getenv("MONGO_URI")  # Get MongoDB URI from environment variable
+
+client = MongoClient(MONGO_URI)
+db = client["timesync_db"]
+history_collection = db["history"]
+
+history_collection.insert_one({
+    "tasks": [{"name": "Test Task", "priority": "High"}],
+    "available_time": ["09:00", "12:00"],
+    "break_preferences": "Every 1 hour",
+    "break_period": "15 minutes",
+    "timetable": [
+        {"time": "09:00 - 10:00", "task": "Test Task", "priority": "High"}
+    ]
+})
+
+print("✅ Test data inserted!")
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -8,21 +32,28 @@ CORS(app)  # Enable cross-origin requests
 def home():
     return "Flask is running!"
 
+#Dashboard
 @app.route('/generate-timetable', methods=['POST'])
 def generate_timetable():
-    data = request.json  # Get data from frontend/Postman
+    data = request.json  
     tasks = data.get("tasks", [])
-    #task duration um add aakane pls
-    available_time = data.get("available_time", ["09:00", "21:00"])  # Default list
+    available_time = data.get("available_time", ["09:00", "21:00"])
     break_preferences = data.get("break_preferences", "Every 1 hour")
     break_period = data.get("break_period", "15 minutes")
-    
 
-    # Ensure available_time is valid
     if not isinstance(available_time, list) or len(available_time) != 2:
-        available_time = ["09:00", "21:00"]  # Fallback default
+        available_time = ["09:00", "21:00"]
 
-    timetable = schedule_tasks(tasks, available_time, break_preferences, break_period)  # Capture the returned timetable
+    timetable = schedule_tasks(tasks, available_time, break_preferences, break_period)
+
+    # ✅ Store in MongoDB
+    history_collection.insert_one({
+        "tasks": tasks,
+        "available_time": available_time,
+        "break_preferences": break_preferences,
+        "break_period": break_period,
+        "timetable": timetable
+    })
 
     return jsonify({"timetable": timetable})
 
@@ -85,6 +116,17 @@ def schedule_tasks(tasks, available_time, break_preferences, break_period):
             work_time = 0  # Reset work timer after a break
 
     return timetable
+
+#History
+@app.route('/history', methods=['GET'])
+def get_history():
+    try:
+        history = list(history_collection.find({}, {"_id": 0}))  # Fetch history
+        print("✅ History fetched successfully")
+        return jsonify({"history": history})
+    except Exception as e:
+        print(f"❌ Error fetching history: {e}")
+        return jsonify({"error": "Failed to fetch history", "message": str(e)}), 500
 
 def list_routes():
     import urllib
