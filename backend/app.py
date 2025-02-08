@@ -86,8 +86,10 @@ def schedule_tasks(tasks, available_time, break_preferences, break_period):
             return hours * 60 + minutes
         return 60  # Default to 60 min if format is invalid
 
+        
     def get_status(start_time, end_time):
-        now = datetime.now().strftime("%H:%M")  
+        """Determines the status of a task based on current time"""
+        now = datetime.now().strftime("%H:%M")  # Get current time as HH:MM
         now_minutes = time_to_minutes(now)
         start_minutes = time_to_minutes(start_time)
         end_minutes = time_to_minutes(end_time)
@@ -98,6 +100,7 @@ def schedule_tasks(tasks, available_time, break_preferences, break_period):
             return "Ongoing"
         else:
             return "Completed"
+
 
     current_time = time_to_minutes(start_time)
     end_time_minutes = time_to_minutes(end_time)
@@ -129,8 +132,8 @@ def schedule_tasks(tasks, available_time, break_preferences, break_period):
                         "time": f"{minutes_to_time(current_time)} - {minutes_to_time(break_end_time)}",
                         "task": "Break",
                         "priority": "-",
-                        "duration": f"{break_duration}m"
-                        #"status": get_status(minutes_to_time(current_time), minutes_to_time(break_end_time))
+                        "duration": f"{break_duration}m",
+                        "status": get_status(minutes_to_time(current_time), minutes_to_time(break_end_time))
                     })
                     current_time = break_end_time  # Move past break time
                     next_break_time = current_time + break_interval  # Schedule next break
@@ -143,8 +146,8 @@ def schedule_tasks(tasks, available_time, break_preferences, break_period):
                 "time": f"{minutes_to_time(current_time)} - {minutes_to_time(task_end_time)}",
                 "task": task["name"],
                 "priority": task["priority"],
-                "duration": f"{allocated_duration}m"
-                #"status": get_status(minutes_to_time(current_time), minutes_to_time(break_end_time))  # ✅ Ensure proper syntax
+                "duration": f"{allocated_duration}m",
+                "status": get_status(minutes_to_time(current_time), minutes_to_time(task_end_time))  # ✅ Ensure proper syntax
             })
 
 

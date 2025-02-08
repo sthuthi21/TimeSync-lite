@@ -107,21 +107,6 @@ const Dashboard = () => {
       });
   };
   
-  /*const getStatus = (startTime, endTime) => {
-    const current = currentTime.toTimeString().slice(0, 5); // HH:mm format
-    if (current < startTime) return "Upcoming";
-    if (current >= startTime && current <= endTime) return "Ongoing";
-    return "Completed";
-  };*/
-  const getStatus = (startTime, endTime) => {
-    if (!startTime || !endTime) return "Unknown"; // Prevent crashes
-    const current = currentTime.toTimeString().slice(0, 5);
-    if (current < startTime) return "Upcoming";
-    if (current >= startTime && current <= endTime) return "Ongoing";
-    return "Completed";
-  };
-  
-
   useEffect(() => {
     fetch("http://127.0.0.1:5001/history") // Flask backend URL
       .then((response) => response.json())
@@ -237,7 +222,7 @@ const Dashboard = () => {
                 <td>{task.task}</td>
                 <td>{task.priority}</td>
                 <td>{task.duration}</td>
-                <td>{getStatus(task.startTime, task.endTime)}</td>
+                <td>{task.status}</td>
               </tr>
             ))}
           </tbody>
