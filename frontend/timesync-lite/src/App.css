@@ -163,7 +163,7 @@ input, select, button {
   font-weight: bold;
 }
 
-/* Header Styles */
+/* Header Styles
 .app-header {
   display: flex;
   justify-content: space-between;
@@ -190,7 +190,8 @@ input, select, button {
 
 .nav-links a:hover {
   color: #d1eaff;
-}
+}  */
+
 
 /* Footer Styles */
 .app-footer {

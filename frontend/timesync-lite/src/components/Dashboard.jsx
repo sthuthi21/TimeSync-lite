@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import Header from "./Header";
+import Footer from "./Footer";
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState([
@@ -128,6 +130,8 @@ const Dashboard = () => {
   }, []);
 
   return (
+    <>
+    <Header/>
     <div className="dashboard-container">
       {/* Left Section: Form */}
       <div className="schedule-form">
@@ -240,8 +244,8 @@ const Dashboard = () => {
         </table>
       </div>
     </div>
-
-    
+    <Footer/>
+    </>
   );
 };
 
