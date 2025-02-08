@@ -2,13 +2,12 @@
 
 
 ## Basic Details
-### Team Name: [Name]
+### Team Name: [SyncOn]
 
 
 ### Team Members
-- Member 1: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+- Member 1: [Varsha Thomas] - [Govt. Model Engineering College]
+- Member 2: [Sthuthi Sambath] - [Govt. Model Engineering College]
 
 ### Hosted Project Link
 [mention your project hosted project link here]
