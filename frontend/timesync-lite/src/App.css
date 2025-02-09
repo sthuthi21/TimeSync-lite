@@ -428,4 +428,10 @@ input, select, button {
   background-color: #333;
 }
 
+.history-table-container {
+  max-height: 400px; /* You can adjust this value based on your preference */
+  overflow-y: auto;  /* Enable vertical scrolling */
+  border: 1px solid #ddd; /* Optional: Add border for better visibility */
+  margin-top: 20px; /* Optional: Adds some spacing above the table */
+}
 

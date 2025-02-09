@@ -34,6 +34,7 @@ print("✅ Test data inserted!")
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])  # Enable cross-origin requests
@@ -41,6 +42,8 @@ CORS(app, origins=["http://localhost:3000"])  # Enable cross-origin requests
 @app.route('/')
 def home():
     return "Flask is running!"
+
+current_date = datetime.now().strftime("%Y-%m-%d")
 
 #Dashboard
 @app.route('/generate-timetable', methods=['POST'])
@@ -63,6 +66,7 @@ def generate_timetable():
 
     # ✅ Store in MongoDB
     history_collection.insert_one({
+        "date": current_date,
         "tasks": tasks,
         "available_time": available_time,
         "break_preferences": break_preferences,
@@ -165,14 +169,44 @@ def schedule_tasks(tasks, available_time, break_preferences, break_period):
 
     return timetable
 #History
-@app.route('/history', methods=['GET'])
+#@app.route('/history', methods=['GET'])
+'''
 def get_history():
     try:
         history = list(history_collection.find({}, {"_id": 0}))  # Fetch history
         if not history:
             return jsonify({"history": []})
         print("✅ History fetched successfully")
+        print(history)
         return jsonify({"history": history})
+    except Exception as e:
+        print(f"❌ Error fetching history: {e}")
+        return jsonify({"error": "Failed to fetch history", "message": str(e)}), 500
+'''
+
+@app.route('/history', methods=['GET'])
+def get_history():
+    try:
+        history = list(history_collection.find({}, {"_id": 0}))  # Fetch history
+        formatted_history = []
+        
+        for entry in history:
+            # Add date field and merge timetable with task information
+            for task in entry["timetable"]:
+                task_data = {
+                    "time": task["time"],
+                    "task": task["task"],
+                    "priority": task["priority"],
+                    #"date": entry.get("date", [])[0], 
+                    "date": entry.get("date", "Unknown Date")  # Get the correct date from the entry itself
+
+                }
+                formatted_history.append(task_data)
+        
+        if not formatted_history:
+            return jsonify({"history": []})
+        
+        return jsonify({"history": formatted_history})
     except Exception as e:
         print(f"❌ Error fetching history: {e}")
         return jsonify({"error": "Failed to fetch history", "message": str(e)}), 500
