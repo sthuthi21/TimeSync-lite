@@ -3,11 +3,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 
 const Dashboard = () => {
-  const [tasks, setTasks] = useState([
-    { time: "09:00 - 10:30", task: "Project Planning", priority: "High", duration: "1h 30m", startTime: "09:00", endTime: "10:30" },
-    { time: "10:30 - 11:00", task: "Break", priority: "-", duration: "30m", startTime: "10:30", endTime: "11:00" },
-    { time: "11:00 - 12:30", task: "Client Meeting", priority: "Medium", duration: "1h 30m", startTime: "11:00", endTime: "12:30" },
-  ]);
+  const [tasks, setTasks] = useState([]);
   const [history, setHistory] = useState([]);
   const [availableStart, setAvailableStart] = useState("09:00");
   const [availableEnd, setAvailableEnd] = useState("17:00");

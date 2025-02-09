@@ -6,9 +6,18 @@ load_dotenv()  # Load environment variables from .env file
 
 MONGO_URI = os.getenv("MONGO_URI")  # Get MongoDB URI from environment variable
 
-client = MongoClient(MONGO_URI)
-db = client["timesync_db"]
-history_collection = db["history"]
+# client = MongoClient(MONGO_URI)
+# db = client["timesync_db"]
+# history_collection = db["history"]
+
+try:
+    client = MongoClient(MONGO_URI)
+    db = client["timesync_db"]
+    history_collection = db["history"]
+    client.admin.command('ping')  # Check connection
+    print("✅ MongoDB connection successful!")
+except Exception as e:
+    print("❌ MongoDB connection failed!", e)
 '''
 history_collection.insert_one({
     "tasks": [{"name": "Test Task", "priority": "High"}],
@@ -160,6 +169,8 @@ def schedule_tasks(tasks, available_time, break_preferences, break_period):
 def get_history():
     try:
         history = list(history_collection.find({}, {"_id": 0}))  # Fetch history
+        if not history:
+            return jsonify({"history": []})
         print("✅ History fetched successfully")
         return jsonify({"history": history})
     except Exception as e:
