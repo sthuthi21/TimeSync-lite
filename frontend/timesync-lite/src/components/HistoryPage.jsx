@@ -162,7 +162,7 @@ const HistoryPage = () => {
   }, []);*/
 
   useEffect(() => { 
-    fetch("http://127.0.0.1:5001/history")
+    fetch("https://timesync-lite.onrender.com/history")
       .then((response) => response.json())
       .then((data) => {
         console.log("History data:", data);

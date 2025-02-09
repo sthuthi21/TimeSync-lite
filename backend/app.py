@@ -37,7 +37,9 @@ from flask_cors import CORS
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000"])  # Enable cross-origin requests
+#CORS(app, origins=["http://localhost:3000"])
+CORS(app, origins=["http://localhost:3000", "https://timesync-lite-frontend1.onrender.com"])
+  # Enable cross-origin requests
 
 @app.route('/')
 def home():

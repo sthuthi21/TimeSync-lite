@@ -77,7 +77,7 @@ const Dashboard = () => {
       break_period: breakPeriod,
     };
   
-    fetch("http://127.0.0.1:5001/generate-timetable", {
+    fetch("https://timesync-lite.onrender.com/generate-timetable", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestData),
@@ -104,7 +104,7 @@ const Dashboard = () => {
   };
   
   useEffect(() => {
-    fetch("http://127.0.0.1:5001/history") // Flask backend URL
+    fetch("https://timesync-lite.onrender.com/history") // Flask backend URL
       .then((response) => response.json())
       .then((data) => setHistory(data.history))
       .catch((error) => console.error("Error fetching history:", error));
